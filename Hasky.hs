@@ -54,7 +54,22 @@ forX cam lo ll xres yres xact yact =
             let (RGB r g b) = getRGB c
             (r:g:b:255:(forX cam lo ll xres yres (xact + 1) yact))
 
+-- | Function to render the whole image        
+renderImage
+  :: Camera            -- ^ the camera of the scene
+     -> [Primitive]    -- ^ list of primitives in the scene
+     -> [Light]        -- ^ list of lights in the scene
+     -> Double        -- ^ x resolution
+     -> Double        -- ^ y resolution
+     -> [Word8]        -- ^ the returned pixel information for the image
+renderImage cam lo ll xres yres xact yact =  
+	foldl unpackBytes [] $ map calcPixel [(x,y) | x  <- [(xakt + xres - 0.5)..0], y  <- [(yakt + yres - 0.5)..0]]
 
+unpackBytes :: [Word8] -> (Word8, Word8, Word8) -> [Word8]
+unpackBytes l (r, g, b) = r:g:b:255:l
+
+calcPixel :: (Int, Int)
+calcPixel = 
 
 getCleanFilename "" = ""
 getCleanFilename str =
