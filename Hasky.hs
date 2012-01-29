@@ -62,14 +62,29 @@ renderImage
      -> Double        -- ^ x resolution
      -> Double        -- ^ y resolution
      -> [Word8]        -- ^ the returned pixel information for the image
-renderImage cam lo ll xres yres xact yact =  
-	foldl unpackBytes [] $ map calcPixel [(x,y) | x  <- [(xakt + xres - 0.5)..0], y  <- [(yakt + yres - 0.5)..0]]
+renderImage cam lo ll xres yres =  
+    --foldl unpackBytes [] $ map (\(x, y) -> let { c = Camera.camTrace cam lo ll x y ; (RGB r g b) = getRGB c } in (r, g, b)) [((x + 0.5)/xres, (yres - y + 0.5)/yres) | y <- [1..yres], x <- [0..xres-1]]
+    foldl unpackBytes [] $ map (\(x, y) -> let { (RGB r g b) = getRGB $ Camera.camTrace cam lo ll x y } in (r, g, b)) [((xres - x + 0.5)/xres, (y + 0.5)/yres) | y <- [0..yres-1], x <- [1..xres]]
 
 unpackBytes :: [Word8] -> (Word8, Word8, Word8) -> [Word8]
 unpackBytes l (r, g, b) = r:g:b:255:l
 
-calcPixel :: (Int, Int)
-calcPixel = 
+
+-- calcPixel
+  -- :: Camera            -- ^ the camera of the scene
+     -- -> [Primitive]    -- ^ list of primitives in the scene
+     -- -> [Light]        -- ^ list of lights in the scene
+     -- -> Double        -- ^ x resolution
+     -- -> Double        -- ^ y resolution
+     -- -> Double        -- ^ actual x index
+     -- -> Double        -- ^ actual y index
+     -- -> (Word8, Word8, Word8)       -- ^ the returned pixel information for one line
+
+ -- :: (Double, Double) -> 
+-- calcPixel cam lo ll x y = 
+    -- let c = Camera.camTrace cam lo ll x y
+    -- let (RGB r g b) = getRGB c
+    -- (r, g, b)
 
 getCleanFilename "" = ""
 getCleanFilename str =
@@ -141,7 +156,7 @@ main = do
         let xres = fromIntegral width
         let yres = fromIntegral height
         let (Scene (Camera campos camlookat _ _) llist plist) = scene
-        let rgba   = Data.ByteString.pack (forY (getSimpleCamera campos camlookat xres yres) plist llist xres yres 0)
+        let rgba   = Data.ByteString.pack $ renderImage (getSimpleCamera campos camlookat xres yres) plist llist xres yres
         let bmp    = packRGBA32ToBMP width height rgba
         writeBMP ((getCleanFilename $ head args) ++ ".bmp") bmp
         return ()
