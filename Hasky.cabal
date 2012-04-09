@@ -1,5 +1,5 @@
 Name:                Hasky
-Version:             0.4
+Version:             0.5
 Description:         HASKell raYtracer
 Author:              Robert Worgul
 Maintainer:          r.worgul@stud.fh-sm.de
@@ -8,4 +8,4 @@ Cabal-Version:       >=1.2
 
 Executable hasky
   Main-is:           Hasky.hs
-  Build-Depends:     base >= 3 && < 5, haskell98, bmp, bytestring
+  Build-Depends:     base >= 3 && < 5, haskell98, bytestring, time, binary
