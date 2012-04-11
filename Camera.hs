@@ -28,8 +28,11 @@ type Down = Vector3
 
 -- | Returns a Camera data type with the simple input of position
 -- look-at x-resolution y-resolution
-getSimpleCamera pos lookat x y = 
-    let camdir = (Vector.norm (lookat-pos))
+getSimpleCamera :: Vector.Vector3 -> Vector.Vector3 -> Int -> Int -> Camera
+getSimpleCamera pos lookat xres yres = 
+    let x = fromIntegral xres
+        y = fromIntegral yres
+        camdir = (Vector.norm (lookat-pos))
         sky = Vector3 0 1 0
         vx = sky * camdir -- (Vector3 vx1 vx2 vx3)
         camright = (if vx == Vector.o then
