@@ -6,7 +6,7 @@ import System( getArgs )
 import Camera
 import Color
 --import Codec.BMP
-import Data.ByteString as BSStrict (pack, ByteString, concat)
+import Data.ByteString as BSStrict hiding (foldl, map, reverse, take, length, readFile, putStrLn) --(pack, ByteString, concat)
 import Data.ByteString.Lazy  as BSLazy (pack, cons', empty, fromChunks, writeFile, ByteString)
 import Option
 import Vector
@@ -19,6 +19,14 @@ import List (elemIndex)
 import GHC.Word
 import Bitmap
 import Data.Time
+
+import Data.Maybe
+import Control.Monad.Par
+
+import Control.DeepSeq (NFData) 
+
+instance NFData BSStrict.ByteString 
+
 
 -- | Main render loop, returns a List of Word8 representing the r,g,b pixels of the final image
 forY
@@ -84,7 +92,8 @@ renderImageTest cam lo ll xresolution yresolution =
     let xres = fromIntegral xresolution
         yres = fromIntegral yresolution
     in
-        BSLazy.fromChunks $ map (\(x, y) -> let { (RGB r g b) = getRGB $ Camera.camTrace cam lo ll x y } in Bitmap.getByteString xresolution (round x) r g b) [((x + 0.5)/xres, (yres - y + 0.5)/yres) | y <- [0..yres-1], x <- [1..xres]]
+        --BSLazy.fromChunks $ map (\(x, y) -> let { (RGB r g b) = getRGB $ Camera.camTrace cam lo ll x y } in Bitmap.getByteString xresolution (round x) r g b) [((x + 0.5)/xres, (yres - y + 0.5)/yres) | y <- [0..yres-1], x <- [1..xres]]
+        BSLazy.fromChunks $ ((runPar $ parMap (\(x, y) -> let { (RGB r g b) = getRGB $ Camera.camTrace cam lo ll x y } in Bitmap.getByteString xresolution (round x) r g b) [((x + 0.5)/xres, (yres - y + 0.5)/yres) | y <- [0..yres-1], x <- [1..xres]]))
     
     
 
